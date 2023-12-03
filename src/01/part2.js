@@ -27,9 +27,9 @@ module.exports.part2 = (input) => {
 	let total = 0;
 	input.split('\n').forEach((line) => {
 		if (line.length < 1) return; // Blank lines bad
-		const digitsArray = line.match(
-			/(\d|one|two|three|four|five|six|seven|eight|nine)/g,
-		);
+		const re = /(?=(\d|one|two|three|four|five|six|seven|eight|nine))/g;
+		const digitsArray = Array.from(line.matchAll(re), (x) => x[1]);
+		if (!digitsArray) return; // Null array bad
 		const fixedArray = digitsArray.map((entry) => numbers[entry]);
 		total += parseInt('' + fixedArray[0] + fixedArray.slice(-1)[0]);
 	});
