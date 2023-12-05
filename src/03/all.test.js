@@ -1,5 +1,5 @@
 const { part1 } = require('./part1');
-// const { part2 } = require('./part2');
+const { part2 } = require('./part2');
 
 const testCasesPt1 = [
 	[
@@ -23,10 +23,10 @@ describe('Day 3, part 1', () => {
 	});
 });
 
-// const testCasesPt2 =	[['some input', 'some output']];
+const testCasesPt2 = [[testCasesPt1[0][0], 467835]];
 
-// describe('Day 3, part 2', () => {
-// 	test.each(testCasesPt2)('Input: %s. Output: %s', (input, expected) => {
-// 		expect(part2(input)).toBe(expected);
-// 	});
-// });
+describe('Day 3, part 2', () => {
+	test.each(testCasesPt2)('Input: %s. Output: %s', (input, expected) => {
+		expect(part2(input)).toBe(expected);
+	});
+});
