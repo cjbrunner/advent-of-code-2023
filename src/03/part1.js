@@ -26,12 +26,14 @@ module.exports.part1 = (input) => {
 			const index = parseInt(num['index']);
 			const number = parseInt(num[0]);
 			const len = num[0].length;
-			const before =
-				line[Math.max(index - 1, 0)].search(/[\*@\+\-#\/%\$&=]/) > -1;
-			const after =
+			const before = Boolean(
+				line[Math.max(index - 1, 0)].search(/[\*@\+\-#\/%\$&=]/) > -1,
+			);
+			const after = Boolean(
 				line[Math.min(index + len, line.length - 1)].search(
 					/[\*@\+\-#\/%\$&=]/,
-				) > -1;
+				) > -1,
+			);
 			const aboveAndBelow = helper(lineArray, lineNum, index, len);
 			if (before || after || aboveAndBelow) total += number;
 		});
