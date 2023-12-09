@@ -1,0 +1,90 @@
+/**
+ Part 2
+*/
+module.exports.part2 = (input) => {
+	const scanForNum = (str, idx, dir) => {
+		console.log(`str: ${str} idx: ${idx} dir: ${dir}`)
+		const origIdx = idx;
+		while(str[Math.min(Math.max(idx,0),str.length)].match(/\d/)) {
+			idx += dir;
+		}
+		return str.slice(idx, origIdx);
+	};
+
+	const nextToNumer = (str, idx) => {
+		// "*12345"
+		const re = /\d+/g;
+		const before = str[Math.max(idx-1,0)].matchAll(/\d/g)
+		const after = str[Math.min(idx+1,str.length)].matchAll(/\d/g)
+		return {"numBefore": before, "numAfter": after};
+	};
+	const helper = (lineArray, lineNum, index, len) => {
+		// Being extra verbose in this function to improve readability
+		const re = /\*/g; // Just fine a literal star
+		let aboveLineNum = Math.max(lineNum - 1, 0); // Don't go beyond the end of the array.  Just scan the current line--it won't hurt anything
+		let belowLineNum = Math.min(lineNum + 1, lineArray.length - 1); // Don't go beyond the end of the array.  Just scan the current line--it won't hurt anything
+		let start = Math.max(index - 1, 0); // Keep the start of the string index positive
+		let end = len + 2; // Length of the string +1 on each end for diagnal matches
+		let aboveLine = lineArray[aboveLineNum].substr(start, end);
+		let belowLine = lineArray[belowLineNum].substr(start, end);
+		console.log(`bl: ${belowLine}`);
+		const starAboveIdx = aboveLine.search(re);
+		const starBelowIdx = belowLine.search(re);
+		console.log(`sbi: ${starBelowIdx}`)
+		let adjNum;
+		if (starAboveIdx > -1) {
+			// Is there a number to the left or right of this star?
+			adjNum = nextToNumer(aboveLine, starAboveIdx)
+			if (adjNum.numBefore['index'] > -1) return scanForNum(aboveLine, starAboveIdx, -1);
+			if (adjNum.numAfter['index'] > -1) return scanForNum(aboveLine, starAboveIdx, 1);
+			// Is there a number above/diagonally above this star?
+			const doubleAboveLineNum = Math.max(lineNum - 2, 0);
+			start = Math.max(starAboveIdx - 1, 0);
+			const aboveLineSnip = lineArray[doubleAboveLineNum].substr(start, 3);
+			if (aboveLineSnip.search(/\d/) > -1) {
+				return ( scanForNum(lineArray[doubleAboveLineNum], starAboveIdx, -1) || scanForNum(lineArray[doubleAboveLineNum], starAboveIdx, 1) );
+			}
+		}
+		if (starBelowIdx > -1) {
+			// Is there a number to the left or right of this star?
+			adjNum = nextToNumer(belowLine, starBelowIdx)
+			if (adjNum.numBefore['index'] > -1) return scanForNum(belowLine, starBelowIdx, -1);
+			if (adjNum.numAfter['index'] > -1) return scanForNum(belowLine, starBelowIdx, 1);
+			// Is there a number above/diagonally below this star?
+			const doubleBelowLineNum = Math.min(lineNum + 2, lineArray.length-1);
+			start = Math.max(starBelowIdx - 1, 0);
+			const doubleBelowLineSnip = lineArray[doubleBelowLineNum].substr(start, 3);
+			console.log(`dbln: ${doubleBelowLineNum} dbls: ${doubleBelowLineSnip} start: ${start}`)
+			if (doubleBelowLineSnip.search(/\d/) > -1) {
+				return ( scanForNum(lineArray[doubleBelowLineNum], starBelowIdx, -1) || scanForNum(lineArray[doubleBelowLineNum], starBelowIdx, 1) );
+			}
+		}
+	};
+
+	let total = 0;
+	const lineArray = input.split('\n');
+	// Find the horizontal gears only
+	lineArray.forEach((line) => {
+		const re = /\d+\*\d+/g;
+		const arr = Array.from(line.matchAll(re));
+		arr.forEach((gearPair) => {
+			const gears = gearPair[0].split('*')
+			total += parseInt(gears[0]) * parseInt(gears[1]);
+		});
+	});
+	// Find vertical/diagnoal gears
+	let lineNum = 0
+	lineArray.forEach((line) => {
+		const re = /\d+/g;
+		const arr = Array.from(line.matchAll(re));
+		arr.forEach((num) => {
+			const index = parseInt(num['index']);
+			const number = parseInt(num[0]);
+			const len = num[0].length;
+			const otherGear = helper(lineArray, lineNum, index, len);
+			if (otherGear > 0) total += otherGear * number;
+		});
+		lineNum += 1;
+	});
+	return total;
+};
