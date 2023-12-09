@@ -71,7 +71,6 @@ module.exports.part2 = (input) => {
 
 	let ratioTotal = 0;
 	gears.forEach((gearPair) => {
-		console.log(gearPair);
 		ratioTotal += gearPair[0] * gearPair[1];
 	});
 
